@@ -1,0 +1,1 @@
+<?php $host= 'localhost'; $database= 'serietv'; $username= 'root'; $password= '';?>
