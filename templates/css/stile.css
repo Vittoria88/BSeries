@@ -1,0 +1,27 @@
+a,
+a:link,
+a:visited,
+a:hover,
+a:active{text-decoration: none;}
+
+body {
+    background-image: url('/SerieTv/templates/images/sfondoutente.png'); 
+    background-size:cover;
+}
+
+.menu {
+ background-color: #00ff00;
+ height: 80px;
+ padding-top: 15px;
+ padding-left: 15px;
+}
+
+.copertina {
+    min-width:320px;
+    max-width:320px;
+    min-height:180px;
+    max-height:180px;
+    height:auto;
+    width:auto;
+}
+
