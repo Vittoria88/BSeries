@@ -3,16 +3,15 @@
 require_once 'include.php';
 
 /**
- * La classe FSerie fornisce query per le serie tv
- * @author Gruppo 3
+ * La classe FQuiz fornisce query per il quiz
+ * @author V&N
  * @package Foundation
  */
 
-class FListaQuiz
+class FQuiz
 {
     private static $tables="quiz";
-    public $row = array();
-
+    
      /**
      * 
      * questo metodo restituisce il nome della tabella sul DB per la costruzione delle Query
@@ -22,22 +21,15 @@ class FListaQuiz
     public static function getTables(){
         return static::$tables;
     }
-
-    public static function getTablesLikes(){
-        return static::$tablesLikes;
-    }
-
    
      /**
      * 
      * questo metodo restituisce la stringa dei valori della tabella sul DB per la costruzione delle Query
      * @return string $values valori della tabella
      */
+    /*
     
-    public static function getValues(){
-        return static::$values;
-    }
-    
+    */
     /** 
      * Funzione che estrapola dal db le domande
      * @return object $id della domanda
@@ -54,23 +46,13 @@ class FListaQuiz
      * @return object $risposta5
      * @return object $genere5
      */
-
+    /* Funzione che estrapola dal db le domande*/
     public static function ListaDomande(){
         $sql="SELECT * FROM ".static::getTables(). " ORDER BY parte ASC, id ASC;";
         //echo $sql; die();
         $db=FDatabase::getInstance();
         $result=$db->exist($sql);
-
-        return $result;
-    }
-
-    public static function ListaGeneri($sqlAdd){
-        //$sql="SELECT COUNT(*) as likes FROM ".static::getTablesLikes(). $sqlAdd;
-        $sql="SELECT DISTINCT A.GENERE, (SELECT COUNT(B.ID) FROM likes B WHERE A.GENERE = B.GENERE) AS LIKES FROM serie A" .$sqlAdd. " ORDER BY LIKES DESC, A.GENERE ASC";
-        //echo $sql; die();
-        $db=FDatabase::getInstance();
-        $result=$db->exist($sql);
-
+        
         return $result;
     }
 }
