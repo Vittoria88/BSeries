@@ -7,16 +7,8 @@ require_once 'include.php';
  * Contiene i seguenti attributi (e i relativi metodi):
  * -id: è un identificativo autoincrement, relativo al'utente;
  * -username: username account utente;
- * -password: password account;
- * -name: nome dell'utente;
- * -surname: cognome dell'utente;
- * -sex: sesso utente;
- * -datan: data di nascità utente;
- * -email: email utente;
- * -telnumber: numero cell utente;
- * -bio: breve descrizione utente;
- * -activate: account attivo o no.
- *  @author Gruppo 3
+ * -password: password account utente;
+ *  @author V&N
  *  @package Entity
  */ 
 class EUtente
@@ -38,7 +30,7 @@ class EUtente
      * @param $val valore inserito
      * @return bool
      */
-    static function valUsername($val):bool{
+    static function valUsername($val){
         if(!preg_match("/^([a-zA-Z0-9_]{3,30})$/",$val)){
             return false;
            }
@@ -50,7 +42,7 @@ class EUtente
      * @param $val valore inserito
      * @return bool
      */
-    static function valPassword($val):bool{
+    static function valPassword($val){
         if(!preg_match("/^([a-zA-Z0-9_]{3,30})$/",$val)){
             return false;
            }
@@ -81,7 +73,3 @@ class EUtente
         return $this->password;
     }
 }
-
-
-
-
