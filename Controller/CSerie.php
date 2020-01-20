@@ -4,8 +4,9 @@ require_once 'include.php';
 
 
 /**
- * La classe CInfo implementa la funzionalità riguardanti le informazioni
- * @author Gruppo 3
+ * La classe CSerie implementa le funzioni di controllo per la pagina di visualizzazione 
+ * dell'elenco delle serietv. Se la richiesta HTTP è POST l'utente proviene dal quiz o dal form di ricerca.
+ * @author V&N
  * @package Controller
  */
 
@@ -14,21 +15,24 @@ class CSerie
 {
     static function Serie()
     {
-        $idNewLike = 0;
-
-        if ($_SERVER['REQUEST_METHOD'] == "POST") {
-            //Controllo per inserimento Like
-            if($_POST["idserie"] > 0 & $_POST["idutente"] > 0 & isset($_POST["genere"])) {
-                $like = new ESerie($_POST["idserie"],$_POST["idutente"],$_POST["genere"]);
-                $idNewLike = FSerie::store($like);
-
-            }
-        }
-
-        //if ($_SERVER['REQUEST_METHOD'] == "GET") 
+        $gen1="";
+        $gen2="";
+        $str = "";
+        if ($_SERVER['REQUEST_METHOD'] == "POST") 
         {
-            $view = new VSerie();
-            $view->showSerie($idNewLike);
+            if(isset($_POST['str']))
+                $str = $_POST['str'];
+            else
+                { 
+                    $gen1 = $_POST['genere1'];
+                    $gen2 = $_POST['genere2'];
+                }
         }
+        $lista_genere = FSerie::ListaGenere($str,$gen1,$gen2);
+
+        $lista_serie = FSerie::ListaSerie($str,$gen1,$gen2);
+
+        $view = new VSerie();
+        $view->showSerie($lista_serie, $lista_genere);
     }
 }
