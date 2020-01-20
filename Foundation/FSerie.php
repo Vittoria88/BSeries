@@ -4,118 +4,94 @@ require_once 'include.php';
 
 /**
  * La classe FSerie fornisce query per le serie tv
- * @author Vittoria
+ * @author V&N
  * @package Foundation
  */
 
 class FSerie
 {
-    private static $tables="serie";
-    private static $tablesLikes="likes";
-    private static $values="(:id,:idserie,:idutente,:genere)";
-    public $row = array();
+    private static $tables = "serie";
+    private static $values= "(:id, :titolo,:genere ,:autore, :copertina,)";
 
-     /**
-     * 
-     * questo metodo restituisce il nome della tabella sul DB per la costruzione delle Query
-     * @return string $tables nome della tabella
-     */
 
-    public static function getTables(){
+    public static function getTables()
+    {
         return static::$tables;
     }
 
-    public static function getTablesLikes(){
-        return static::$tablesLikes;
+
+    public function construct(){
+
     }
 
-    
-    public function __construct(){}
+    public static function bind($stmt,ESerie $sSerie){
+        $stmt->bindValue(':id', NULL, PDO::PARAM_INT); //l'id � posto a NULL poich� viene dato automaticamente dal DBMS (AUTOINCREMENT_ID)
+        $stmt->bindValue(':titolo', $sSerie->getTitolo(), PDO::PARAM_STR);
+        $stmt->bindValue(':genere', $sSerie->getGenere(), PDO::PARAM_STR);
+        $stmt->bindValue(':autore', $sSerie->getAutore(), PDO::PARAM_STR);
+        $stmt->bindValue(':copertina', $sSerie->getCopertina(), PDO::PARAM_BLOB);
 
+    }
     /**
-     * Questo metodo lega gli attributi idserie e idutente da inserire nella tabella likes
-     * @param PDOStatement $stmt 
-     * @param $IDserie $IDutente i dati devono essere inseriti nel DB
-     */
-    
-    public static function bind($stmt, ESerie $like){
-        $stmt->bindValue(':id',NULL, PDO::PARAM_INT); //l'id è posto a NULL poichè viene dato automaticamente dal DBMS (AUTOINCREMENT_ID)
-        $stmt->bindValue(':idserie', $like->getIdSerie(), PDO::PARAM_INT); 
-        $stmt->bindValue(':idutente', $like->getIdUtente(), PDO::PARAM_INT);
-        $stmt->bindValue(':genere', $like->getGenere(), PDO::PARAM_STR);
-   }
-
-     /**
      * 
      * questo metodo restituisce la stringa dei valori della tabella sul DB per la costruzione delle Query
      * @return string $values valori della tabella
      */
-    
-    public static function getValues(){
+
+     public static function getValues(){
         return static::$values;
     }
-    
+
     /** 
      * Funzione che estrapola dal db le serie tv disponibili
-     * @return object $id della serie
-     * @return object $titolo
-     * @return object $stagione
-     * @return object $autore
-     * @return object $attore1
-     * @return object $personaggio1
-     * @return object $attore2
-     * @return object $personaggio2
-     * @return object $attore3
-     * @return object $personaggio3
-     * @return object $trama
+     * @return string $id della serie
+     * @return string $titolo
+     * @return string $autore
      * @return object $copertina
      */
 
-    public static function ListaSerie($IDserie){
-        $sqlAdd = "";
-
-        if($IDserie>0)
+     /*
+     funzione che restituisce un array di oggetti ESerie in base ai parametri che gli vengono passati,
+     tali parametri si popolano dopo aver effettuato il quiz o dopo aver inserito una stringa nel form di ricerca
+     */
+    public static function ListaSerie($str,$gen1,$gen2)
+    {
+        if ($str != "") 
         {
-            $sqlAdd = " WHERE ID=" . $IDserie;
+            $str = " WHERE TITOLO LIKE '%" . $str . "%'";
         }
-
-        $sql="SELECT * FROM ".static::getTables().$sqlAdd. " ORDER BY genere ASC, titolo ASC;";
-        //echo $sql; die();
-        $db=FDatabase::getInstance();
-        $result=$db->exist($sql);
-
-        if(!empty($result) && $IDserie>0)
+        else if($gen1 != "")
         {
-            $resultSingle[0] = $result;
-            $result = $resultSingle;
+            $gen1 = " WHERE GENERE='".$gen1."' OR  GENERE='".$gen2."'";
         }
-        
-        return $result;
-    }
+        $sql = "SELECT * FROM ".static::getTables().$str.$gen1." ORDER BY genere ASC, titolo ASC";
+        $db = FDatabase::getInstance();
+        $result = $db->loadMultiple($sql);
+        if($result!=null){
+            for($i=0; $i<count($result); $i++){
+                $sserie[]=new ESerie($result[$i]['titolo'], $result[$i]['genere'], $result[$i]['autore'],$result[$i]['copertina']);
+                $sserie[$i]->setId($result[$i]['id']); //aggiorna l'informazione coerentemente con il db 
+            }
 
-    public static function LikesSerie($IDserie){
-        $sql="SELECT COUNT(*) as likes FROM ".static::getTablesLikes(). " WHERE idserie=" . $IDserie;
-        //echo $sql; die();
-        $db=FDatabase::getInstance();
-        $result=$db->exist($sql);
-
-        if(!empty($result))
-        {
-            $result = $result["likes"];
-        } else 
-        {
-            $result = 0;
+            return $sserie;
         }
-
-        return $result;
-    }
-
-    public static function store($like){
-        $sql="INSERT INTO ".static::getTablesLikes()." VALUES ".static::getValues();
-        $db=FDatabase::getInstance();
-        $id=$db->store($sql,"FSerie",$like);
-        if($id) return $id;
         else return null;
-    }   
+    }
+    /* 
+     La funzione ListaGenere restituisce un array contentente tutti i generi delle serie in ordine alfabetico
+    */
+    public static function ListaGenere($str,$gen1,$gen2)
+    {
+        if ($str != "") {
+            $str = " WHERE TITOLO LIKE '%" . $str . "%'";
+        }
+        else if($gen1 != "")
+        {
+            $gen1 = " WHERE GENERE='".$gen1."' OR  GENERE='".$gen2."'";
+        }
+        $sql = "SELECT DISTINCT(GENERE) FROM ".static::getTables().$str.$gen1." ORDER BY genere ASC, titolo ASC";
+        $db = FDatabase::getInstance();
+        $result = $db->exist($sql);
+        return $result;
+    } 
 }
-
